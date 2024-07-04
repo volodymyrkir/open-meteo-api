@@ -5,7 +5,7 @@ import requests
 from geopy.geocoders import Nominatim
 import pandas as pd
 
-from consts import (
+from src.consts import (
     TARGET_CITIES, BASE_WEATHER_URL, HOURLY_FIELDS, GEO_FIELDS,
     HISTORICAL_WEATHER_URL, HISTORICAL_FIELDS, HISTORICAL_HOURLY_FIELDS,
     HISTORICAL_DATE, HISTORICAL_TIMESTAMP,
