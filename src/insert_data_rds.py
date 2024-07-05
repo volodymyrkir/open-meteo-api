@@ -46,7 +46,7 @@ def create_connection_string() -> str:
     return f'mysql+pymysql://{rds_user}:{password}@{rds_host}:3306/{database_name}'
 
 
-def insert_df_to_db(df: pd.DataFrame, table_name: str) -> None:
+def insert_df_to_db(df: pd.DataFrame, table_name: str, conn_str: str) -> None:
     """
     Inserts dataframe to database.
         Creates connection and handles integrity errors.
@@ -54,8 +54,8 @@ def insert_df_to_db(df: pd.DataFrame, table_name: str) -> None:
     Args:
         df (pd.DataFrame): Dataframe to be inserted.
         table_name (str): Target table name.
+        conn_str (str): Connection string to the database.
     """
-    conn_str = create_connection_string()
     with create_engine(conn_str).begin() as conn:
         try:
             df.to_sql(table_name, con=conn, if_exists='append', index=False)
