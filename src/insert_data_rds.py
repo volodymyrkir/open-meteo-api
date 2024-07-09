@@ -3,7 +3,7 @@ import logging
 
 import boto3
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
 
 
@@ -46,7 +46,12 @@ def create_connection_string() -> str:
     return f'mysql+pymysql://{rds_user}:{password}@{rds_host}:3306/{database_name}'
 
 
-def insert_df_to_db(df: pd.DataFrame, table_name: str, conn_str: str) -> None:
+def insert_df_to_db(
+        df: pd.DataFrame,
+        table_name: str,
+        conn_str: str,
+        mappings: dict[str, list[str]]
+) -> None:
     """
     Inserts dataframe to database.
         Creates connection and handles integrity errors.
@@ -55,11 +60,19 @@ def insert_df_to_db(df: pd.DataFrame, table_name: str, conn_str: str) -> None:
         df (pd.DataFrame): Dataframe to be inserted.
         table_name (str): Target table name.
         conn_str (str): Connection string to the database.
+        mappings (dict[str, list[str]]): Dictionary of table's schema.
     """
     with create_engine(conn_str).begin() as conn:
         try:
-            df.to_sql(table_name, con=conn, if_exists='append', index=False)
+            df.to_sql('temp', con=conn, if_exists='replace', index=False)
+            columns = ','.join(mappings[table_name])
+            query = f"""
+                    INSERT IGNORE INTO {table_name} ({columns})
+                    SELECT {columns} FROM temp;
+            """
+            conn.execute(text(query))
             logging.info(f'Loaded {len(df)} records to table {table_name}.')
+            conn.execute(text('DROP TABLE temp;'))
         except IntegrityError:
             logging.error('New records violating the primary key '
                           f'in table {table_name}, skipping.')

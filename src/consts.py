@@ -4,7 +4,7 @@
 TARGET_CITIES = [
     'Kyiv', 'Tel Aviv-Yafo', 'Lhasa', 'Ulaanbaatar',
     'Reykjavík', 'Johannesburg', 'Dublin', 'Bern',
-    'Brasília', 'Kingston'
+    'Brasília', 'Kingston', 'London'
 ]
 
 BASE_WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?'
@@ -29,3 +29,13 @@ AVERAGE_TEMP_THRESHOLD = 20
 
 CITIES_DATA_TABLE_NAME = 'cities_data'
 WEATHER_AGGREGATED_TABLE_NAME = 'weather_aggregated'
+
+MAPPINGS = {
+    'cities_data': [
+        'latitude', 'longitude', 'elevation', 'timezone'
+    ],
+    'weather_aggregated': [
+        'latitude', 'longitude', 'avg_temp_last_week', 'avg_temp_next_week',
+        'year_start_temp', 'year_start_humidity', 'year_start_wind_speed'
+    ]
+}
